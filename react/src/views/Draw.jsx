@@ -5,13 +5,13 @@ export default function Draw() {
 
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState(null);
-    const [isSelectedAll, setIsSelectedAll] = useState(false);
 
     const [players, setPlayers] = useState([]);
     const [playersPresent, setPlayersPresent] = useState([]);
     const [teams, setTeams] = useState(null);
 
     const playersPerTeamRef = useRef();
+    const isSelectedAll = playersPresent.length === players.length;
 
     useEffect(() => {
         getPlayers()
@@ -68,14 +68,12 @@ export default function Draw() {
     const onSelectAll = () => {
         if (isSelectedAll) {
             setPlayersPresent([]);
-            setIsSelectedAll(false);
         } else {
             const selectedPlayers = players.map(player => (
                 player.id
             ));
             
-            setPlayersPresent([selectedPlayers]);
-            setIsSelectedAll(true);
+            setPlayersPresent(selectedPlayers);
         }
     }
 
@@ -125,8 +123,8 @@ export default function Draw() {
                                     <td>{p.ability}</td>
                                     <td>{p.is_goal_keeper ? 'Yes' : 'No'}</td>
                                     <td>
-                                        {(playersPresent.includes(p.id) || isSelectedAll) && <button onClick={ev => setPlayerPresence(p.id)} className="btn btn-add">Present</button>}
-                                        {!(playersPresent.includes(p.id) || isSelectedAll) && <button onClick={ev => setPlayerPresence(p.id)} className="btn btn-delete">Not Present</button>}
+                                        {playersPresent.includes(p.id) && <button onClick={ev => setPlayerPresence(p.id)} className="btn btn-add">Present</button>}
+                                        {!playersPresent.includes(p.id) && <button onClick={ev => setPlayerPresence(p.id)} className="btn btn-delete">Not Present</button>}
                                     </td>
                                 </tr>
                             ))}

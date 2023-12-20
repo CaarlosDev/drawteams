@@ -18,9 +18,15 @@ class TeamController extends Controller {
             return $player['is_goal_keeper'] == false;
         });
 
+        $totalPlayersCount = count($goalKeepers + $players);
+
         if ( count($players) < ($teamSize * 2) - 2 || $goalKeepers < 2 ) {
             return response()->json([
                 'message' => 'Not enough players to complete at least 2 teams.'
+            ], 422);
+        } else if ($totalPlayersCount > ($teamSize * count($goalKeepers))) {
+            return response()->json([
+                'message' => 'Too many players for too few goalkeepers.'
             ], 422);
         }
 
@@ -31,21 +37,6 @@ class TeamController extends Controller {
 
         foreach (array_keys($teams) as $key) {
             $teams[$key] = $this->buildTeam($teams[$key], $players, $teamSize);
-        }
-
-        if ($players != []) {
-            foreach ($players as $player) {
-                $lastIndex = count(array_keys($teams));
-
-                if (count($teams[$lastIndex]) < $teamSize) {
-                    array_push($teams[$lastIndex], $player);
-                } else {
-                    $teams[$lastIndex + 1] = [$player];
-                }
-
-                $key = array_search($player, $players);
-                array_splice($players, $key, 1);
-            }
         }
 
         return response()->json($teams);
